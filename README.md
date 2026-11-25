@@ -1,5 +1,7 @@
 # mcp-agent-shield
 
+[![teylerboal-dev/mcp-agent-shield MCP server](https://glama.ai/mcp/servers/teylerboal-dev/mcp-agent-shield/badges/score.svg)](https://glama.ai/mcp/servers/teylerboal-dev/mcp-agent-shield)
+
 **Zero-dependency MCP Server & x402 (Base USDC) Pay-Per-Call Security API for AI Coding Agents.**
 
 Protect Claude Code, Cursor, Codex, Windsurf, and autonomous agents from indirect prompt-injection attacks and fake GitHub bounties — installable in 10 seconds as an **MCP server** or deployable as an **x402 pay-per-call Base USDC micro-API**.
