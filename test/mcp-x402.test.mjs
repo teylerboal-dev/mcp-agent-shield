@@ -20,19 +20,29 @@ describe('MCP STDIO Server', () => {
 				for (const p of parts) {
 					if (p.trim()) lines.push(JSON.parse(p));
 				}
-				if (lines.length >= 3) {
+				if (lines.length >= 6) {
 					child.kill();
 					resolve();
 				}
 			});
 		});
 
-		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize' }) + '\n');
-		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }) + '\n');
 		child.stdin.write(
 			JSON.stringify({
 				jsonrpc: '2.0',
-				id: 3,
+				id: 1,
+				method: 'initialize',
+				params: { protocolVersion: '2025-03-26' },
+			}) + '\n',
+		);
+		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'ping' }) + '\n');
+		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }) + '\n');
+		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 4, method: 'prompts/list' }) + '\n');
+		child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 5, method: 'resources/list' }) + '\n');
+		child.stdin.write(
+			JSON.stringify({
+				jsonrpc: '2.0',
+				id: 6,
 				method: 'tools/call',
 				params: {
 					name: 'scan_prompt_injection',
@@ -45,8 +55,14 @@ describe('MCP STDIO Server', () => {
 
 		await done;
 		assert.equal(lines[0].result.serverInfo.name, 'mcp-agent-shield');
-		assert.equal(lines[1].result.tools.length, 2);
-		const scanResult = JSON.parse(lines[2].result.content[0].text);
+		assert.equal(lines[0].result.protocolVersion, '2025-03-26');
+		assert.ok(lines[0].result.instructions.includes('scan_prompt_injection'));
+		assert.deepEqual(lines[1].result, {});
+		assert.equal(lines[2].result.tools.length, 2);
+		assert.equal(lines[2].result.tools[0].annotations.readOnlyHint, true);
+		assert.deepEqual(lines[3].result.prompts, []);
+		assert.deepEqual(lines[4].result.resources, []);
+		const scanResult = JSON.parse(lines[5].result.content[0].text);
 		assert.equal(scanResult.status, 'BLOCK');
 		assert.equal(scanResult.findings[0].id, 'PS-001');
 	});
